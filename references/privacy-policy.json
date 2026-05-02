@@ -1,0 +1,34 @@
+{
+  "version": "2026-05-02",
+  "name": "privacy-policy",
+  "description": "个人命理项目的隐私与提交治理规则。",
+  "privatePaths": [
+    "reports/",
+    "*.pdf",
+    "*.docx",
+    "*.xlsx",
+    ".env",
+    ".env.*"
+  ],
+  "sensitiveKeywords": [
+    "身份证",
+    "护照",
+    "手机号",
+    "家庭住址",
+    "银行账号",
+    "API_KEY",
+    "SECRET",
+    "TOKEN",
+    "PRIVATE KEY",
+    "sk-",
+    "Bearer ",
+    "pk_live_",
+    "BEGIN PRIVATE KEY"
+  ],
+  "rules": [
+    "reports/ 默认视为个人敏感输出，不提交到仓库。",
+    "用户历史经历只用于当前报告上下文，除非用户明确要求，不写入 references/。",
+    "提交前应运行 privacy-check，确认没有报告、密钥或个人敏感材料被 staged。",
+    "README 和 SKILL 可以描述机制，不应包含具体个人报告内容。"
+  ]
+}

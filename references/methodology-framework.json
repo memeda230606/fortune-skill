@@ -1,0 +1,242 @@
+{
+  "version": "2026-05-02",
+  "name": "fortune-methodology-framework",
+  "description": "命理深度报告的方法论核对框架。用于把经典规则、现实校准、人生阶段模板和报告证据链结构化。",
+  "minimumReportRule": "深度报告至少覆盖 sixCategories 中每一类的 relevantChecks；若某类不适用，需说明不适用原因。",
+  "sixCategories": [
+    {
+      "id": "classical_rule_index",
+      "name": "经典规则索引",
+      "goal": "把经典典籍从泛泛引用变成可追溯规则来源。",
+      "keyPoints": [
+        {
+          "id": "classic_qiongtong_tiaohou",
+          "name": "穷通调候",
+          "sources": ["穷通宝典"],
+          "requiredWhen": "判断寒暖燥湿、季节失衡、用神是否先取调候时",
+          "evidenceFields": ["pillars.month", "dayMaster.wuXing", "fiveElements.scores"],
+          "reportQuestion": "此命最需要先调候，还是先扶抑？调候之字在原局、大运、流年是否出现？"
+        },
+        {
+          "id": "classic_zi_ping_geju",
+          "name": "格局成败",
+          "sources": ["子平真诠", "渊海子平"],
+          "requiredWhen": "判断格局、相神、忌神、格局清浊时",
+          "evidenceFields": ["pillars", "tenGods", "hiddenStems"],
+          "reportQuestion": "月令所取之格是否成格？相神是否有力？忌神是否破格？"
+        },
+        {
+          "id": "classic_ditiansui_qishi",
+          "name": "气势清浊与源流",
+          "sources": ["滴天髓"],
+          "requiredWhen": "原局一方五行成势、气势偏枯或用神被埋时",
+          "evidenceFields": ["fiveElements.scores", "formationAnalysis"],
+          "reportQuestion": "命局主气在哪里？是清、浊、偏枯，还是有源有流？"
+        },
+        {
+          "id": "classic_shenfeng_bingyao",
+          "name": "病药法",
+          "sources": ["神峰通考"],
+          "requiredWhen": "判断一个年份为什么表面有机会但仍不顺，或压力中为何有解法时",
+          "evidenceFields": ["tendencyAnalysis", "formationAnalysis", "combinationTransformations"],
+          "reportQuestion": "命局的病是什么？大运流年带来的药是否到位，还是药被合住/冲破？"
+        }
+      ]
+    },
+    {
+      "id": "yongshen_system",
+      "name": "用神体系",
+      "goal": "区分扶抑、调候、通关、病药、格局用神，避免把喜忌简化为单一五行。",
+      "keyPoints": [
+        {
+          "id": "yongshen_fuyi",
+          "name": "扶抑用神",
+          "sources": ["渊海子平", "子平真诠"],
+          "requiredWhen": "日主强弱明显时",
+          "evidenceFields": ["dayMaster", "fiveElements.scores", "tendencyAnalysis.baseStrength"],
+          "reportQuestion": "日主强弱如何？扶身或泄耗哪一类更有利？"
+        },
+        {
+          "id": "yongshen_tiaohou",
+          "name": "调候用神",
+          "sources": ["穷通宝典"],
+          "requiredWhen": "出生季节寒暖燥湿对命局影响大时",
+          "evidenceFields": ["pillars.month", "fiveElements.scores"],
+          "reportQuestion": "调候之字是否比扶抑更优先？大运流年是否补调候？"
+        },
+        {
+          "id": "yongshen_tongguan",
+          "name": "通关用神",
+          "sources": ["滴天髓", "神峰通考"],
+          "requiredWhen": "原局或岁运出现强冲、强克、两神交战时",
+          "evidenceFields": ["relationAnalysis", "formationAnalysis"],
+          "reportQuestion": "冲克双方之间是否有通关之神？通关是否可用？"
+        },
+        {
+          "id": "yongshen_bingyao",
+          "name": "病药用神",
+          "sources": ["神峰通考"],
+          "requiredWhen": "报告要解释长期结构性问题或阶段性转好原因时",
+          "evidenceFields": ["fiveElements.scores", "tendencyAnalysis", "lifeEventSignals"],
+          "reportQuestion": "该阶段是病加重、药到位，还是药到但现实承接不足？"
+        }
+      ]
+    },
+    {
+      "id": "interaction_priority",
+      "name": "八字作用优先级",
+      "goal": "明确多重信号冲突时谁主导，避免看到合就说好、看到冲就说坏。",
+      "keyPoints": [
+        {
+          "id": "priority_month_order",
+          "name": "月令优先",
+          "sources": ["子平真诠", "渊海子平"],
+          "requiredWhen": "判断原局强弱、格局和喜忌基础时",
+          "evidenceFields": ["pillars.month", "hiddenStems.month"],
+          "reportQuestion": "月令是否决定主气？其他干支是否能改变月令主导？"
+        },
+        {
+          "id": "priority_dayun_context",
+          "name": "大运为环境，流年为触发",
+          "sources": ["三命通会", "千里命稿"],
+          "requiredWhen": "做 5-10 年流年报告时",
+          "evidenceFields": ["majorFortune", "years[].bazi.daYun", "years[].relationAnalysis"],
+          "reportQuestion": "同一流年在当前大运里是放大、缓解，还是被牵制？"
+        },
+        {
+          "id": "priority_formation_over_single_relation",
+          "name": "成局重于单点",
+          "sources": ["三命通会"],
+          "requiredWhen": "三合、三会、半合、半会出现时",
+          "evidenceFields": ["formationAnalysis"],
+          "reportQuestion": "这是单点合冲，还是已经形成气势？成局的五行是喜是忌？"
+        },
+        {
+          "id": "priority_combination_transform",
+          "name": "合化成立性",
+          "sources": ["滴天髓", "子平真诠"],
+          "requiredWhen": "天干合、地支六合出现时",
+          "evidenceFields": ["combinationTransformations"],
+          "reportQuestion": "合是否能化？若不能化，是合作、牵制、拖延，还是关系绑定？"
+        }
+      ]
+    },
+    {
+      "id": "ziwei_deepening",
+      "name": "紫微深化",
+      "goal": "从星曜罗列升级到宫位、四化、三方四正和大限流年的动态叠加。",
+      "keyPoints": [
+        {
+          "id": "ziwei_mutagen_palace",
+          "name": "四化落宫",
+          "sources": ["紫微斗数"],
+          "requiredWhen": "分析流年重点、人事领域和风险落点时",
+          "evidenceFields": ["ziweiYears[].summary.yearly.mutagenPalaces", "ziweiYears[].summary.decadal.mutagenPalaces"],
+          "reportQuestion": "化禄、化权、化科、化忌分别落在哪些宫？引动事业、迁移、财帛、夫妻、田宅还是疾厄？"
+        },
+        {
+          "id": "ziwei_sanfang_sizheng",
+          "name": "三方四正",
+          "sources": ["紫微斗数"],
+          "requiredWhen": "判断命宫、官禄、财帛、迁移、夫妻等核心宫位时",
+          "evidenceFields": ["base.ziwei", "ziweiYears[].summary"],
+          "reportQuestion": "主宫与三方四正是否互相支持，还是吉凶分散？"
+        },
+        {
+          "id": "ziwei_decadal_year_overlay",
+          "name": "原局-大限-流年叠加",
+          "sources": ["紫微斗数"],
+          "requiredWhen": "判断重大变化、换城市、换工作、家庭资产变化时",
+          "evidenceFields": ["base.ziwei.horoscopeSummary", "ziweiYears[].summary"],
+          "reportQuestion": "大限主题和流年四化是否叠到同一宫位或同一人生领域？"
+        },
+        {
+          "id": "ziwei_support_stars",
+          "name": "魁钺辅弼昌曲禄马羊陀",
+          "sources": ["紫微斗数"],
+          "requiredWhen": "判断贵人、文书、考试、迁移、阻力和执行风险时",
+          "evidenceFields": ["ziweiYears[].summary.*.notableStars"],
+          "reportQuestion": "贵人和阻力星曜落在哪些宫位？是能落地的支持，还是只有名义光环？"
+        }
+      ]
+    },
+    {
+      "id": "historical_calibration",
+      "name": "历史经验校准",
+      "goal": "用已发生事件验证此盘如何响应大运、流年和现实选择。",
+      "keyPoints": [
+        {
+          "id": "calibration_event_table",
+          "name": "事件校准表",
+          "sources": ["现实经历"],
+          "requiredWhen": "用户提供履历、人生转折、家庭或健康节点时",
+          "evidenceFields": ["userProvidedEvents", "majorFortune", "years"],
+          "reportQuestion": "关键年份的现实事件与命理触发是否同向？若不一致，需修正哪个判断？"
+        },
+        {
+          "id": "calibration_response_pattern",
+          "name": "个人响应模式",
+          "sources": ["现实经历", "千里命稿"],
+          "requiredWhen": "预测未来转折、贵人、迁移、创业/换工作时",
+          "evidenceFields": ["lifeEventSignals", "relationAnalysis", "ziweiYears"],
+          "reportQuestion": "此人过去遇到冲、合、换运、贵人时，是主动切换、被动调整，还是先压后开？"
+        },
+        {
+          "id": "calibration_reality_constraints",
+          "name": "现实约束校准",
+          "sources": ["现实经历"],
+          "requiredWhen": "涉及融资、换城市、换伴侣、健康、学业、家庭资产等重大选择时",
+          "evidenceFields": ["lifeEventSignals", "tendencyAnalysis.ratings"],
+          "reportQuestion": "命理有信号时，现实中是否有预算、授权、家庭条件、健康状态和退出机制承接？"
+        }
+      ]
+    },
+    {
+      "id": "life_stage_templates",
+      "name": "人生阶段模板",
+      "goal": "按年龄阶段选择报告重点，不把所有人都套进中年事业模板。",
+      "keyPoints": [
+        {
+          "id": "stage_child_family_health",
+          "name": "儿童：健康、性格、亲子",
+          "sources": ["八字六亲", "紫微十二宫"],
+          "requiredWhen": "儿童或小学阶段报告",
+          "evidenceFields": ["lifeEventSignals.studyAndExams", "base.ziwei"],
+          "reportQuestion": "学习方式、身体敏感点、亲子支持和家庭环境如何影响成长？"
+        },
+        {
+          "id": "stage_student_study_exam",
+          "name": "青少年/学生：学业考试",
+          "sources": ["印星", "食伤", "官杀", "父母宫", "官禄宫"],
+          "requiredWhen": "学生、考试、升学、专业选择",
+          "evidenceFields": ["lifeEventSignals.studyAndExams", "tendencyAnalysis.roleReality", "ziweiYears"],
+          "reportQuestion": "利系统学习、竞赛作品、考试规则，还是需要调整专业方向和压力管理？"
+        },
+        {
+          "id": "stage_young_adult_career_city_relationship",
+          "name": "青年：职业、城市、感情",
+          "sources": ["大运", "迁移宫", "夫妻宫", "官禄宫"],
+          "requiredWhen": "初入职场、换城市、恋爱婚姻、专业转型",
+          "evidenceFields": ["lifeEventSignals.careerChange", "lifeEventSignals.cityMove", "lifeEventSignals.relationshipChange"],
+          "reportQuestion": "职业起步、城市平台、伴侣关系是否同年互相牵动？"
+        },
+        {
+          "id": "stage_midlife_platform_assets_family",
+          "name": "中年：平台、资产、家庭",
+          "sources": ["财星", "官杀", "印星", "财帛宫", "田宅宫", "夫妻宫"],
+          "requiredWhen": "中年职业平台、创业、资产、家庭责任",
+          "evidenceFields": ["lifeEventSignals", "tendencyAnalysis.ratings", "ziweiYears[].summary"],
+          "reportQuestion": "机会、组织、家庭资产、伴侣分工和健康消耗是否可同时承接？"
+        },
+        {
+          "id": "stage_late_life_health_legacy",
+          "name": "后半程：健康、传承、居住",
+          "sources": ["疾厄宫", "田宅宫", "子女宫", "时柱"],
+          "requiredWhen": "退休、健康、资产传承、子女关系、居住安排",
+          "evidenceFields": ["lifeEventSignals.healthStress", "base.ziwei", "majorFortune"],
+          "reportQuestion": "后半程应如何安排健康节奏、居住资产、子女关系和知识/资产传承？"
+        }
+      ]
+    }
+  ]
+}

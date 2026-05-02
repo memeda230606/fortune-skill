@@ -1,0 +1,24 @@
+{
+  "name": "fortune-skill",
+  "version": "1.0.0",
+  "description": "Source-available noncommercial fortune-analysis skill.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run verify",
+    "verify": "node scripts/verify.mjs",
+    "report-data": "node scripts/fortune-report-data.mjs",
+    "report-draft": "node scripts/report-draft.mjs",
+    "rule-matcher": "node scripts/rule-matcher.mjs",
+    "report-qa": "node scripts/report-qa.mjs",
+    "methodology": "node scripts/methodology-framework.mjs",
+    "report-framework": "node scripts/report-framework.mjs",
+    "privacy-check": "node scripts/privacy-check.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "dependencies": {
+    "iztro": "^2.5.8",
+    "lunar-javascript": "^1.7.7"
+  }
+}
