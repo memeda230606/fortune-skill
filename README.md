@@ -13,6 +13,25 @@ Source-available，非商用使用。详见 [LICENSE](LICENSE) 和
 > 该目录已加入 `.gitignore`，不上传到任何远程仓库。如需提交相关变更，
 > 请先运行 `node scripts/privacy-check.mjs` 自查。
 
+---
+
+## 30 秒上手
+
+```bash
+git clone https://github.com/ai-freer/fortune-skill.git
+cd fortune-skill
+./install.sh
+```
+
+`install.sh` 会自动安装依赖、检测本地 agent 平台（Claude Code / Codex / Cursor /
+Trae）并把仓库 symlink 到对应 skill 目录。**重启 agent**，对话里说
+"算八字 / 看紫微 / 今年运势 / 合婚" 等触发词即可调用。
+
+完整安装指引（分平台手动安装、依赖要求、验证、升级、卸载、常见问题）见
+**[INSTALL.md](./INSTALL.md)**。
+
+---
+
 ## 项目概述
 
 为 OpenClaw agent 构建一个中国传统命理分析 Skill，支持紫微斗数和八字命理两大体系。用户通过自然语言对话提供出生信息，系统自动排盘并结合经典典籍进行专业分析。
@@ -130,24 +149,31 @@ Layer 1 保证排盘精确（LLM 自己算干支会出错），Layer 2 提供系
 
 ## 安装
 
-克隆仓库后先安装运行时依赖：
+完整指引（分平台手动安装、依赖要求、验证、升级、卸载、常见问题）见
+**[INSTALL.md](./INSTALL.md)**。
+
+**一键安装**：
+
+```bash
+./install.sh
+```
+
+自动装依赖、检测本地 agent 平台（Claude Code / Codex / Cursor / Trae）并 symlink。
+
+**手动安装**：
 
 ```bash
 npm ci
 python3 -m pip install -r requirements.txt
+npm run verify        # 26 项自检
 ```
 
-最小验证：
+**单脚本快速验证**（出生信息为虚构演示数据）：
 
 ```bash
-node scripts/time-normalize.mjs --solar "1990-05-15" --hour 15 --birthplace "上海"
 node scripts/bazi-chart.mjs --solar "1990-05-15" --hour 15 --gender male --birthplace "上海"
 node scripts/ziwei-chart.mjs --solar "1990-05-15" --hour 15 --gender male --birthplace "上海"
 python3 scripts/bazi-classic.py --solar "1990-05-15" --hour 15 --gender male --birthplace "上海"
-npm run report-framework -- --summary
-npm run rule-matcher -- --solar "1990-05-15" --hour 15 --gender male --birthplace "上海" --from 2026 --to 2027 --ziwei-years 2026
-npm run report-draft -- --solar "1990-05-15" --hour 15 --gender male --birthplace "上海" --from 2026 --to 2027 --ziwei-years 2026
-npm run privacy-check -- --no-git
 ```
 
 ---
