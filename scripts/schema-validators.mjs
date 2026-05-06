@@ -97,6 +97,31 @@ export function validateFortuneReportDataOutput(output) {
   };
 }
 
+export function validateHecanSummaryOutput(output) {
+  const errors = [];
+  ensure(Boolean(output.timeBasis?.principle), 'timeBasis.principle missing', errors);
+  ensure(Number.isInteger(output.summary?.judgmentCount), 'summary.judgmentCount missing', errors);
+  ensure(Array.isArray(output.judgments), 'judgments must be array', errors);
+  ensure(output.summary?.judgmentCount === output.judgments?.length, 'summary.judgmentCount should equal judgments.length', errors);
+  for (const [index, judgment] of (output.judgments || []).entries()) {
+    ensure(Boolean(judgment.domain), `judgments[${index}].domain missing`, errors);
+    ensure(Boolean(judgment.claim), `judgments[${index}].claim missing`, errors);
+    ensure(typeof judgment.confidence === 'number' && judgment.confidence >= 0 && judgment.confidence <= 1, `judgments[${index}].confidence must be 0..1`, errors);
+    ensure(['低', '中', '中高', '高'].includes(judgment.confidenceLabel), `judgments[${index}].confidenceLabel invalid`, errors);
+    ensure(Boolean(judgment.evidence), `judgments[${index}].evidence missing`, errors);
+    ensure(Array.isArray(judgment.evidence?.bazi), `judgments[${index}].evidence.bazi must be array`, errors);
+    ensure(Array.isArray(judgment.evidence?.ziwei), `judgments[${index}].evidence.ziwei must be array`, errors);
+    ensure(Array.isArray(judgment.evidence?.rules), `judgments[${index}].evidence.rules must be array`, errors);
+    ensure(Array.isArray(judgment.conflicts), `judgments[${index}].conflicts must be array`, errors);
+    ensure(Array.isArray(judgment.assumptions), `judgments[${index}].assumptions must be array`, errors);
+  }
+  return {
+    ok: errors.length === 0,
+    schema: 'fortune.hecanSummary.v1',
+    errors
+  };
+}
+
 export function attachSchemaValidation(output, validator) {
   const validation = validator(output);
   output.schemaValidation = validation.errors.length

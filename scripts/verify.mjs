@@ -380,6 +380,30 @@ const checks = [
     }
   },
   {
+    label: 'hecan summary confidence',
+    run() {
+      const result = run(this.label, node, [
+        'scripts/hecan-summary.mjs',
+        '--solar', '1990-05-15',
+        '--hour', '15',
+        '--gender', 'male',
+        '--birthplace', '上海',
+        '--from', '2026',
+        '--to', '2027',
+        '--ziwei-years', '2026',
+        '--focus', 'career,migration,health'
+      ]);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.schemaValidation?.ok === true, 'expected hecan schema validation ok');
+      assert(json.summary?.judgmentCount === 3, 'expected focused hecan judgments');
+      assert(json.timeBasis?.principle?.includes('真太阳时'), 'expected true solar time principle');
+      assert(json.judgments.every(item => item.confidence >= 0 && item.confidence <= 1), 'expected confidence range');
+      assert(json.judgments.some(item => item.domain === 'career'), 'expected career judgment');
+      assert(json.judgments.every(item => item.evidence?.bazi && item.evidence?.ziwei && item.evidence?.rules), 'expected separated evidence');
+      assert(json.judgments.every(item => item.recommendationBoundary?.includes('不写成确定事件')), 'expected recommendation boundary');
+    }
+  },
+  {
     label: 'report draft smoke',
     run() {
       const result = run(this.label, node, [
