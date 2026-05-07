@@ -270,7 +270,7 @@ node scripts/hecan-summary.mjs \
   --focus career,migration,health
 ```
 
-该脚本输出 `fortune.hecanSummary.v2` 结构化判断卡片。每条 `judgments[]` 保留 `claim`、`evidence.bazi`、`evidence.ziwei`、`evidence.rules`、`conflicts`、`assumptions`、`confidence` 和 `confidenceLabel`，并新增 `timeScope`、`evidenceNodes[]`、`counterEvidence[]`、`coverage`、`riskBoundary`、`confidenceBreakdown`。`evidenceNodes[]` 必须能追溯到 `fieldPath`、来源、系统、层级、权重和极性；`counterEvidence[]` 用于记录反证、时间可靠性、未校准、规则缺失、覆盖不足、反向例和漏触发等约束。`coverage` 用于说明每个领域的最低证据要求、必要来源和正文必须承接的现实边界。`riskBoundary` 用于健康、财务、关系、家庭、迁移等敏感领域的专业边界。置信度只表示证据一致性和可判定性，不代表事件必然发生。
+该脚本输出 `fortune.hecanSummary.v2` 结构化判断卡片。每条 `judgments[]` 保留 `claim`、`evidence.bazi`、`evidence.ziwei`、`evidence.rules`、`conflicts`、`assumptions`、`confidence` 和 `confidenceLabel`，并新增 `timeScope`、`evidenceNodes[]`、`counterEvidence[]`、`coverage`、`riskBoundary`、`confidenceBreakdown`。`evidenceNodes[]` 必须能追溯到 `fieldPath`、来源、系统、层级、权重和极性；`counterEvidence[]` 用于记录反证、时间可靠性、未校准、规则缺失、覆盖不足、反向例和漏触发等约束。`coverage` 用于说明每个领域的最低证据要求、必要来源和正文必须承接的现实边界。`riskBoundary` 在健康和财务投资领域保留必要专业边界；在关系、家庭、迁移等领域只作为现实承接边界，不用于过度削弱命理判断。置信度只表示证据一致性和可判定性，不代表事件必然发生。
 
 需要检查结构化合参 v2 是否健康时，可调用：
 

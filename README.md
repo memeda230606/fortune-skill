@@ -157,7 +157,7 @@ Layer 1 保证排盘精确（LLM 自己算干支会出错），Layer 2 提供系
 - `evidenceNodes[]`：字段级证据节点，含 `source`、`system`、`layer`、`aspect`、`fieldPath`、`polarity` 和 `weight`。
 - `counterEvidence[]`：反证或约束，覆盖八字/紫微信号冲突、规则缺失、覆盖不足、时间可靠性、未校准、反向例和漏触发。
 - `coverage`：每个领域的最低证据要求、必要来源、已覆盖来源、缺口和正文必须承接的现实边界。
-- `riskBoundary`：健康、财务、关系、家庭、迁移等敏感领域的专业边界。
+- `riskBoundary`：健康和财务投资保留必要专业边界；关系、家庭、迁移等领域只写现实承接边界，避免过度安全化削弱判断。
 - `confidenceBreakdown.calibrationSample`：按领域统计历史事件、反向例和漏触发，并影响校准加权和置信度上限。
 
 ---

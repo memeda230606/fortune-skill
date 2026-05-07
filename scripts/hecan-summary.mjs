@@ -453,15 +453,15 @@ function calibrationProfileFor(calibration, domain) {
 
 function riskBoundaryFor(domain) {
   const boundaries = {
-    career: '事业判断必须落到岗位名分、组织授权、现金流、健康承接和可退出方案，不直接写成必然升迁或离职。',
-    migration: '迁移判断必须同时看城市平台、家庭成本、预算、身份/签证或居住条件和退出机制。',
+    career: '事业判断落到岗位名分、组织授权、现金流、健康承接和可退出方案；这些是承接条件，不用于削弱事业信号。',
+    migration: '迁移判断写城市平台、家庭成本、预算、身份/签证或居住条件和退出机制；重点是承接路径，不把迁移信号简化成搬迁断语。',
     wealth: '财务判断只写预算、现金流和资产风险边界，不构成投资建议；重大财务决策以专业财务意见为准。',
-    relationship: '关系判断只写沟通模式、边界、共同资产和压力来源，不替双方做分合决定。',
-    home: '家庭/田宅判断必须回到家庭协商、居住安排、产权/预算和长辈责任，不写成确定家庭事件。',
+    relationship: '关系判断写沟通模式、共同资产、压力来源和双方选择；重点是把关系信号落到可协商事项，不替双方做分合决定。',
+    home: '家庭/田宅判断回到家庭协商、居住安排、产权/预算和长辈责任；重点是说明家庭信号如何承接现实安排。',
     health: '健康判断只作为身心消耗和恢复节奏观察，不构成医学诊断；具体健康问题以医生意见为准。',
-    study: '学业判断只写学习方式、考试规则、家庭支持和身心节奏，不写成必然录取或落榜。'
+    study: '学业判断写学习方式、考试规则、家庭支持和身心节奏；避免把考试信号写成必然录取或落榜。'
   };
-  return boundaries[domain] || '判断只能作为命盘先验，需要结合现实资源、专业意见和个人选择。';
+  return boundaries[domain] || '判断作为命盘先验，需要结合现实资源、承接条件和个人选择。';
 }
 
 function counterEvidenceFor(domain, data, baziSignal, ziweiScore, evidenceCounts, time, calibrationStatus, evidenceNodes, coverage, calibrationProfile) {
