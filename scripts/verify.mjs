@@ -395,11 +395,20 @@ const checks = [
       ]);
       const json = parseJson(this.label, result.stdout);
       assert(json.schemaValidation?.ok === true, 'expected hecan schema validation ok');
+      assert(json.schemaVersion === 'fortune.hecanSummary.v2', 'expected hecan v2 schema version');
       assert(json.summary?.judgmentCount === 3, 'expected focused hecan judgments');
+      assert(json.summary?.cardVersion === 'v2', 'expected v2 card summary');
+      assert(json.summary?.evidenceNodeCount >= 3, 'expected v2 evidence nodes');
+      assert(json.summary?.coveragePassCount === 3, 'expected focused domain coverage pass');
+      assert(Array.isArray(json.summary?.domainCoverage), 'expected domain coverage summary');
       assert(json.timeBasis?.principle?.includes('真太阳时'), 'expected true solar time principle');
       assert(json.judgments.every(item => item.confidence >= 0 && item.confidence <= 1), 'expected confidence range');
       assert(json.judgments.some(item => item.domain === 'career'), 'expected career judgment');
       assert(json.judgments.every(item => item.evidence?.bazi && item.evidence?.ziwei && item.evidence?.rules), 'expected separated evidence');
+      assert(json.judgments.every(item => item.cardVersion === 'v2' && item.timeScope && item.confidenceBreakdown?.final >= 0 && item.confidenceBreakdown?.calibrationSample), 'expected v2 judgment cards');
+      assert(json.judgments.every(item => item.coverage?.status === 'pass' && item.riskBoundary), 'expected coverage and risk boundary');
+      assert(json.judgments.every(item => Array.isArray(item.evidenceNodes) && item.evidenceNodes.every(node => node.fieldPath !== undefined && node.polarity && node.system && node.layer)), 'expected traceable typed evidence nodes');
+      assert(json.judgments.every(item => Array.isArray(item.counterEvidence)), 'expected counter evidence arrays');
       assert(json.judgments.every(item => item.recommendationBoundary?.includes('不写成确定事件')), 'expected recommendation boundary');
     }
   },
@@ -416,6 +425,10 @@ const checks = [
         '--to', '2026',
         '--ziwei-years', '2026'
       ]);
+      assert(result.stdout.includes('## 3.2 结构化合参 v2 判断卡片'), 'expected hecan v2 card section');
+      assert(result.stdout.includes('## 3.3 v2 证据节点与反证摘要'), 'expected hecan v2 evidence digest section');
+      assert(result.stdout.includes('覆盖策略'), 'expected v2 coverage policy output');
+      assert(result.stdout.includes('风险边界'), 'expected v2 risk boundary output');
       assert(result.stdout.includes('## 4. 经典规则命中'), 'expected rule match section');
       assert(result.stdout.includes('## 7. 紫微专项评分'), 'expected ziwei domain score section');
       assert(result.stdout.includes('## 9. 紫微四化交互'), 'expected mutagen interaction section');
@@ -446,6 +459,70 @@ const checks = [
       const relationship = run(this.label, node, ['scripts/report-draft.mjs', '--type', 'relationship_family_report', ...commonArgs]);
       assert(relationship.stdout.includes('## 4. 关系与家庭议题信号'), 'expected relationship specialized section');
     }
+	  },
+  {
+    label: 'hecan audit smoke',
+    run() {
+      const result = run(this.label, node, [
+        'scripts/hecan-audit.mjs',
+        '--solar', '1990-05-15',
+        '--hour', '15',
+        '--gender', 'male',
+        '--birthplace', '上海',
+        '--from', '2026',
+        '--to', '2027',
+        '--ziwei-years', '2026',
+        '--focus', 'career,migration,health'
+      ]);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.ok === true, 'expected hecan audit ok');
+      assert(json.summary?.schemaVersion === 'fortune.hecanSummary.v2', 'expected audited v2 schema');
+      assert(json.summary?.judgmentCount === 3, 'expected audited focused judgments');
+      assert(json.summary?.evidenceNodeCount >= 3, 'expected audited evidence nodes');
+      assert(json.summary?.coveragePassCount === 3, 'expected audited coverage pass count');
+    }
+  },
+  {
+    label: 'hecan domain calibration profile',
+    run() {
+      const file = join(root, '.tmp-hecan-calibration.json');
+      writeFileSync(file, JSON.stringify({
+        events: [
+          { date: '2022', domain: '财务投资', event: '资产配置调整', impact: '中等', outcome: '先难后稳' },
+          { date: '2023', domain: '工作', event: '岗位职责扩大', impact: '重大', outcome: '顺利落地' },
+          { date: '2024', domain: '健康', event: '睡眠压力上升', impact: '中等', outcome: '调整后改善' }
+        ],
+        falsePositives: [
+          { date: '2021', domain: '财务投资', event: '预期财务波动未明显发生' }
+        ],
+        falseNegatives: [
+          { date: '2020', domain: '财务投资', event: '无明显信号但出现支出压力' }
+        ]
+      }, null, 2));
+      try {
+        const result = run(this.label, node, [
+          'scripts/hecan-summary.mjs',
+          '--solar', '1990-05-15',
+          '--hour', '15',
+          '--gender', 'male',
+          '--birthplace', '上海',
+          '--from', '2026',
+          '--to', '2027',
+          '--ziwei-years', '2026',
+          '--focus', 'wealth',
+          '--calibration-file', file
+        ]);
+        const json = parseJson(this.label, result.stdout);
+        const wealth = json.judgments.find(item => item.domain === 'wealth');
+        assert(wealth?.evidence?.calibration?.length >= 1, 'expected calibration evidence for wealth');
+        assert(wealth.confidenceBreakdown?.calibrationSample?.domainEvents === 1, 'expected domain calibration event count');
+        assert(wealth.confidenceBreakdown?.calibrationSample?.domainFalsePositives === 1, 'expected domain false positive count');
+        assert(wealth.confidenceBreakdown?.calibrationSample?.domainFalseNegatives === 1, 'expected domain false negative count');
+        assert(wealth.counterEvidence.some(item => item.type === 'domain_calibration_misses'), 'expected calibration miss counter evidence');
+      } finally {
+        rmSync(file, { force: true });
+      }
+    }
   },
   {
 	    label: 'report qa smoke',
@@ -467,7 +544,7 @@ const checks = [
 	        const result = run(this.label, node, ['scripts/report-qa.mjs', '--file', file]);
 		        const json = parseJson(this.label, result.stdout);
 		        assert(json.ok === true, 'expected report qa ok');
-		        assert(json.summary?.checkCount === 21, 'expected twenty one qa checks');
+		        assert(json.summary?.checkCount === 27, 'expected twenty seven qa checks');
 	      } finally {
 	        rmSync(file, { force: true });
 	      }
@@ -493,6 +570,7 @@ const checks = [
         assert(json.summary?.reportType === 'long', 'expected long report type');
         assert(json.findings.some(item => item.id === 'methodology_matrix' && item.severity === 'error'), 'expected methodology matrix error');
         assert(json.findings.some(item => item.id === 'dimension_balance' && item.severity === 'error'), 'expected dimension balance error');
+        assert(json.findings.some(item => item.id === 'hecan_v2_cards' && item.severity === 'error'), 'expected hecan v2 card error');
       } finally {
         rmSync(file, { force: true });
       }

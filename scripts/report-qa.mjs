@@ -109,6 +109,7 @@ function check(content) {
   const mentionsNoble = /贵人/.test(content);
   const reportType = detectReportType(content);
   const isLongReport = reportType === 'long';
+  const hasHecanV2 = /结构化合参\s*v2|fortune\.hecanSummary\.v2|v2\s*判断卡片/.test(content);
   const methodologyItems = [
     { id: 'classical_rule_index', label: '经典规则索引', pattern: /经典规则|穷通|调候|格局|病药|滴天髓|子平/ },
     { id: 'yongshen_system', label: '用神体系', pattern: /用神体系|扶抑|调候用神|通关|病药用神|喜用神/ },
@@ -177,6 +178,56 @@ function check(content) {
         /现实承接|边界|不单独断|保守|校准/.test(content)
       ),
       severity: 'warn'
+    },
+    {
+      id: 'hecan_v2_cards',
+      label: '结构化合参 v2 卡片',
+      pass: topicScoped || !isLongReport || hasHecanV2,
+      severity: isLongReport ? 'error' : 'warn',
+      detail: '长报告应包含结构化合参 v2 判断卡片，避免只靠正文自由发挥。'
+    },
+    {
+      id: 'hecan_v2_traceability',
+      label: 'v2 证据追溯',
+      pass: !hasHecanV2 || (
+        /证据节点|evidenceNodes|证据来源|fieldPath/.test(content) &&
+        /反证\/约束|反证|约束|counterEvidence/.test(content) &&
+        /置信度构成|confidenceBreakdown/.test(content)
+      ),
+      severity: 'error',
+      detail: 'v2 卡片必须能看到证据节点、反证/约束和置信度构成。'
+    },
+    {
+      id: 'hecan_v2_boundary',
+      label: 'v2 判断边界',
+      pass: !hasHecanV2 || /不代表事件必然发生|不写成确定事件|只描述证据一致性|可判定性/.test(content),
+      severity: 'error',
+      detail: 'v2 卡片必须说明置信度只代表证据一致性/可判定性，不代表事件必然发生。'
+    },
+    {
+      id: 'hecan_v2_coverage_policy',
+      label: 'v2 覆盖策略',
+      pass: !hasHecanV2 || /覆盖策略|覆盖状态|requiredSources|必要来源|缺口/.test(content),
+      severity: 'error',
+      detail: 'v2 卡片必须呈现领域覆盖状态、必要来源或缺口。'
+    },
+    {
+      id: 'hecan_v2_body_binding',
+      label: 'v2 正文绑定',
+      pass: !hasHecanV2 || /正文绑定要求|本领域正文必须引用|证据来源.*现实承接|风险边界/.test(content),
+      severity: 'error',
+      detail: 'v2 卡片不能只贴表，必须要求正文引用证据来源、现实承接和风险边界。'
+    },
+    {
+      id: 'hecan_v2_sensitive_boundaries',
+      label: 'v2 敏感领域专业边界',
+      pass: !hasHecanV2 || (
+        !/健康\/消耗|健康/.test(content) || /医学|医生|诊断/.test(content)
+      ) && (
+        !/财务\/兑现|财务/.test(content) || /现金流|预算|投资建议|财务专业/.test(content)
+      ),
+      severity: 'error',
+      detail: '健康和财务领域必须出现医学/医生/诊断、现金流/预算/投资建议等专业边界。'
     },
     {
       id: 'reality_calibration',

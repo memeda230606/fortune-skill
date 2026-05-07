@@ -8,6 +8,7 @@
     "verify": "node scripts/verify.mjs",
     "report-data": "node scripts/fortune-report-data.mjs",
     "hecan-summary": "node scripts/hecan-summary.mjs",
+    "hecan-audit": "node scripts/hecan-audit.mjs",
     "report-draft": "node scripts/report-draft.mjs",
     "rule-matcher": "node scripts/rule-matcher.mjs",
     "report-qa": "node scripts/report-qa.mjs",

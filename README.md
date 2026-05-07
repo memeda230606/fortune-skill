@@ -144,13 +144,21 @@ Layer 1 保证排盘精确（LLM 自己算干支会出错），Layer 2 提供系
 | 命令 | 用途 |
 |------|------|
 | `npm run report-data -- ...` | 聚合基础盘、年度/逐月流年、方法论框架、报告模板、紫微三方四正与专项评分 |
-| `npm run hecan-summary -- ...` | 输出结构化合参判断单元，汇总八字、紫微、经典规则、现实校准、冲突点和可解释置信度 |
+| `npm run hecan-summary -- ...` | 输出结构化合参 v2 判断卡片，汇总八字、紫微、经典规则、现实校准、证据节点、反证/约束和可解释置信度 |
+| `npm run hecan-audit -- ...` | 审计结构化合参 v2 卡片是否具备字段追溯、反证/约束、置信度拆解、真太阳时边界和未校准上限 |
 | `npm run rule-matcher -- ...` | 输出调候、病药、作用优先级、神煞边界、大运切换、伏吟反吟、十神现代映射等规则命中点 |
 | `npm run report-draft -- ...` | 按模板生成主报告摘要、十年流年、两年逐月或长期综合 Markdown 草稿 |
-| `npm run report-qa -- --file reports/xxx.md` | 检查最终报告是否覆盖免责声明、时辰边界、方法论、现实校准、隐私、条件性贵人边界和绝对化风险 |
+| `npm run report-qa -- --file reports/xxx.md` | 检查最终报告是否覆盖免责声明、时辰边界、方法论、现实校准、v2 合参卡片、隐私、条件性贵人边界和绝对化风险 |
 | `npm run privacy-check` | 提交前检查 staged 文件是否包含 `reports/` 或敏感材料 |
 
 说明：历史经历不是默认产品化输入，只有用户主动提供时才作为可选校准材料；贵人也不是默认专项报告，只有用户明确询问人脉、平台资源或贵人问题时才单独展开。
+
+`hecan-summary` v2 判断卡片包含：
+- `evidenceNodes[]`：字段级证据节点，含 `source`、`system`、`layer`、`aspect`、`fieldPath`、`polarity` 和 `weight`。
+- `counterEvidence[]`：反证或约束，覆盖八字/紫微信号冲突、规则缺失、覆盖不足、时间可靠性、未校准、反向例和漏触发。
+- `coverage`：每个领域的最低证据要求、必要来源、已覆盖来源、缺口和正文必须承接的现实边界。
+- `riskBoundary`：健康、财务、关系、家庭、迁移等敏感领域的专业边界。
+- `confidenceBreakdown.calibrationSample`：按领域统计历史事件、反向例和漏触发，并影响校准加权和置信度上限。
 
 ---
 
@@ -202,7 +210,10 @@ python3 scripts/bazi-classic.py --solar "1990-05-15" --hour 15 --minute 0 --gend
 # stdout → { "sanming": "...", "clashes": [...], "scores": {...}, ... }
 
 node scripts/hecan-summary.mjs --solar "1990-05-15" --hour 15 --gender male --birthplace "上海" --from 2026 --to 2027 --ziwei-years 2026
-# stdout → { "judgments": [{ "domain": "career", "confidence": 0.62, "evidence": {...}, ... }], ... }
+# stdout → { "schemaVersion": "fortune.hecanSummary.v2", "judgments": [{ "domain": "career", "evidenceNodes": [...], "counterEvidence": [...], "confidenceBreakdown": {...}, ... }], ... }
+
+node scripts/hecan-audit.mjs --solar "1990-05-15" --hour 15 --gender male --birthplace "上海" --from 2026 --to 2027 --ziwei-years 2026
+# stdout → { "ok": true, "summary": { "schemaVersion": "fortune.hecanSummary.v2", "judgmentCount": 7, ... }, "findings": [] }
 ```
 
 `--minute` 为可选参数，默认 `0`；出生时间接近时辰边界时建议提供分钟。

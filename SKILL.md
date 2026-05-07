@@ -270,7 +270,19 @@ node scripts/hecan-summary.mjs \
   --focus career,migration,health
 ```
 
-该脚本输出 `judgments[]`，每条包含 `claim`、`evidence.bazi`、`evidence.ziwei`、`evidence.rules`、`conflicts`、`assumptions`、`confidence` 和 `confidenceLabel`。置信度只表示证据一致性和可判定性，不代表事件必然发生。
+该脚本输出 `fortune.hecanSummary.v2` 结构化判断卡片。每条 `judgments[]` 保留 `claim`、`evidence.bazi`、`evidence.ziwei`、`evidence.rules`、`conflicts`、`assumptions`、`confidence` 和 `confidenceLabel`，并新增 `timeScope`、`evidenceNodes[]`、`counterEvidence[]`、`coverage`、`riskBoundary`、`confidenceBreakdown`。`evidenceNodes[]` 必须能追溯到 `fieldPath`、来源、系统、层级、权重和极性；`counterEvidence[]` 用于记录反证、时间可靠性、未校准、规则缺失、覆盖不足、反向例和漏触发等约束。`coverage` 用于说明每个领域的最低证据要求、必要来源和正文必须承接的现实边界。`riskBoundary` 用于健康、财务、关系、家庭、迁移等敏感领域的专业边界。置信度只表示证据一致性和可判定性，不代表事件必然发生。
+
+需要检查结构化合参 v2 是否健康时，可调用：
+
+```bash
+node scripts/hecan-audit.mjs \
+  --solar "YYYY-MM-DD" --hour <0-23> [--minute <0-59>] \
+  --gender <male|female> --birthplace "城市名" \
+  --from 2026 --to 2035 --ziwei-years 2026,2027 \
+  --focus career,migration,health
+```
+
+`hecan-audit` 会审计 schema、真太阳时原则、证据节点字段追溯、证据系统/层级分类、反证/约束、领域覆盖策略、健康/财务专业边界、未校准置信度上限、`confidenceBreakdown` 与 `confidence` 是否一致。深度报告在正式写作前建议先跑 `hecan-summary` 或 `hecan-audit`，再把通过审计的 v2 卡片转成正文。若提供 `--calibration-file`，v2 会按领域统计历史事件、反向例和漏触发，并将其写入 `confidenceBreakdown.calibrationSample`。
 
 需要生成报告草稿时，可先调用：
 

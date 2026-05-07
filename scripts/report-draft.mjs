@@ -10,6 +10,7 @@
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { buildHecanSummary } from './hecan-summary.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -233,6 +234,63 @@ function makeCalibrationBlock(data) {
   return lines.join('\n');
 }
 
+function methodologyCategoryNames(data) {
+  return (data.methodologyFramework?.sixCategories || [])
+    .map(category => category.name)
+    .join('、') || '-';
+}
+
+function makeHecanJudgmentCards(data) {
+  const hecan = buildHecanSummary(data);
+  const rows = [
+    '| 领域 | 时间范围 | 判断 | 置信度 | 覆盖状态 | 证据节点 | 反证/约束 | 置信度构成 |',
+    '|---|---|---|---|---|---|---|---|'
+  ];
+  for (const item of hecan.judgments || []) {
+    const breakdown = item.confidenceBreakdown || {};
+    const parts = [
+      `八字${breakdown.bazi ?? 0}`,
+      `紫微${breakdown.ziwei ?? 0}`,
+      `规则${breakdown.rules ?? 0}`,
+      `密度${breakdown.evidenceDensity ?? 0}`,
+      `校准${breakdown.calibration ?? 0}`,
+      `扣分${roundForReport((breakdown.conflictPenalty ?? 0) + (breakdown.timeReliabilityPenalty ?? 0))}`
+    ].join(' ');
+    rows.push(`| ${item.label} | ${item.timeScope} | ${item.claim} | ${item.confidenceLabel}(${item.confidenceBreakdown?.final ?? item.confidence}) | ${item.coverage?.status || '-'} | ${item.evidenceNodes?.length || 0} | ${item.counterEvidence?.length || 0} | ${parts} |`);
+  }
+  return [
+    '> v2 合参卡片只描述证据一致性和可判定性，不代表事件必然发生；写报告时需把反证、约束和现实承接一起写入。',
+    '',
+    ...rows
+  ].join('\n');
+}
+
+function makeHecanEvidenceDigest(data) {
+  const hecan = buildHecanSummary(data);
+  const lines = [];
+  for (const item of hecan.judgments || []) {
+    const supports = (item.evidenceNodes || [])
+      .filter(node => node.polarity === 'support')
+      .slice(0, 4);
+    const counters = (item.counterEvidence || []).slice(0, 3);
+    lines.push(`### ${item.label}`);
+    lines.push('');
+    lines.push(`- 判断：${item.claim}；置信度 ${item.confidenceLabel}(${item.confidenceBreakdown?.final ?? item.confidence})；时间范围 ${item.timeScope}。`);
+    lines.push(`- 覆盖策略：${item.coverage?.status || '-'}；必要来源 ${item.coverage?.requiredSources?.join('、') || '-'}；已见 ${item.coverage?.presentSources?.join('、') || '-'}；缺口 ${item.coverage?.missingSources?.join('、') || '无'}。`);
+    lines.push(`- 证据来源：${supports.map(node => `${node.source}/${node.layer}:${node.fieldPath || node.type}`).join('；') || '暂无'}。`);
+    lines.push(`- 证据摘要：${supports.map(node => node.summary).join('；') || '暂无'}。`);
+    lines.push(`- 反证/约束：${counters.map(node => node.summary).join('；') || '暂无明显反证或约束'}。`);
+    lines.push(`- 风险边界：${item.riskBoundary || item.recommendationBoundary || '-'}。`);
+    lines.push(`- 正文绑定要求：本领域正文必须引用至少一条证据来源、一条现实承接边界，并说明信号不等于确定事件。`);
+    lines.push('');
+  }
+  return lines.join('\n').trim() || '- 未生成 v2 证据摘要。';
+}
+
+function roundForReport(value) {
+  return Number(value.toFixed(4));
+}
+
 function makeZiweiSummary(ziweiYears) {
   const lines = [];
   for (const item of ziweiYears || []) {
@@ -364,11 +422,20 @@ function renderCommonOpening(data, template, title) {
     '',
     `- 方法论类别：${data.methodologyFramework?.summary?.categoryCount || 0}`,
     `- 关键点：${data.methodologyFramework?.summary?.keyPointCount || 0}`,
+    `- 六大方法论覆盖：${methodologyCategoryNames(data)}`,
     `- 报告模板：${template?.id || 'unknown'}`,
     '',
     '## 3.1 现实校准状态',
     '',
-    makeCalibrationBlock(data)
+    makeCalibrationBlock(data),
+    '',
+    '## 3.2 结构化合参 v2 判断卡片',
+    '',
+    makeHecanJudgmentCards(data),
+    '',
+    '## 3.3 v2 证据节点与反证摘要',
+    '',
+    makeHecanEvidenceDigest(data)
   ];
 }
 
