@@ -20,6 +20,7 @@
   "author": "",
   "license": "PolyForm-Noncommercial-1.0.0",
   "dependencies": {
+    "3meta": "^2.5.1",
     "iztro": "^2.5.8",
     "lunar-javascript": "^1.7.7"
   }

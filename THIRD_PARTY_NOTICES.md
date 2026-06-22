@@ -10,11 +10,13 @@ This file is an engineering notice, not legal advice.
 
 | Component | Source | License / Rights Status | Use |
 |-----------|--------|-------------------------|-----|
+| 3meta | https://github.com/3metaJun/3meta | MIT | Qi Men Dun Jia chart engine |
 | iztro | https://github.com/SylarLong/iztro | MIT | Zi Wei Dou Shu chart engine |
 | lunar-javascript | https://github.com/6tail/lunar-javascript | MIT | Lunar calendar, Ba Zi chart data, shensha, dayun/liunian data |
 | lunar-python | https://pypi.org/project/lunar-python/ | MIT | Python lunar calendar dependency used by vendored Ba Zi integration |
 | colorama | https://pypi.org/project/colorama/ | BSD-style | Python terminal color dependency used by vendored Ba Zi integration |
 | bidict | https://pypi.org/project/bidict/ | MPL-2.0 | Python bidirectional map dependency used by vendored Ba Zi integration |
+| najia | https://github.com/bopo/najia | MIT | Liu Yao Najia chart engine |
 
 ## Vendored Source
 

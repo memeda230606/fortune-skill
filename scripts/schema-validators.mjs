@@ -168,6 +168,77 @@ export function validateHecanSummaryOutput(output) {
   };
 }
 
+export function validateQimenOutput(output) {
+  const errors = [];
+  ensure(output.schemaVersion === 'fortune.qimen.v1', 'schemaVersion must be fortune.qimen.v1', errors);
+  ensure(Boolean(output.input?.datetime), 'input.datetime missing', errors);
+  ensure(Boolean(output.input?.place), 'input.place missing', errors);
+  ensure(Boolean(output.input?.question), 'input.question missing', errors);
+  ensure(['true-solar', 'standard'].includes(output.input?.timeBasis), 'input.timeBasis invalid', errors);
+  if (output.input?.timeBasis === 'true-solar') {
+    validateTimeCorrection(output.timeCorrection, errors);
+  }
+  ensure(Boolean(output.timeInfo?.solarDate), 'timeInfo.solarDate missing', errors);
+  ensure(Boolean(output.timeInfo?.chineseDay), 'timeInfo.chineseDay missing', errors);
+  ensure(Boolean(output.fourPillars?.year?.stem), 'fourPillars.year.stem missing', errors);
+  ensure(Boolean(output.fourPillars?.hour?.branch), 'fourPillars.hour.branch missing', errors);
+  ensure(Boolean(output.ju?.type), 'ju.type missing', errors);
+  ensure(Number.isInteger(output.ju?.number), 'ju.number missing', errors);
+  ensure(Boolean(output.zhiFu?.star), 'zhiFu.star missing', errors);
+  ensure(Boolean(output.zhiShi?.gate), 'zhiShi.gate missing', errors);
+  ensure(Array.isArray(output.palaces), 'palaces must be array', errors);
+  ensure(output.palaces?.length === 9, 'palaces must contain 9 items', errors);
+  for (const [index, palace] of (output.palaces || []).entries()) {
+    ensure(Number.isInteger(palace.position), `palaces[${index}].position missing`, errors);
+    ensure(Boolean(palace.trigram), `palaces[${index}].trigram missing`, errors);
+    ensure(Boolean(palace.gate), `palaces[${index}].gate missing`, errors);
+    ensure(Boolean(palace.star), `palaces[${index}].star missing`, errors);
+    ensure(Boolean(palace.deity), `palaces[${index}].deity missing`, errors);
+  }
+  return {
+    ok: errors.length === 0,
+    schema: 'fortune.qimen.v1',
+    errors
+  };
+}
+
+export function validateLiuyaoOutput(output) {
+  const errors = [];
+  ensure(output.schemaVersion === 'fortune.liuyao.v1', 'schemaVersion must be fortune.liuyao.v1', errors);
+  ensure(Boolean(output.input?.datetime), 'input.datetime missing', errors);
+  ensure(Boolean(output.input?.place), 'input.place missing', errors);
+  ensure(Boolean(output.input?.question), 'input.question missing', errors);
+  ensure(['manual', 'time'].includes(output.input?.method), 'input.method invalid', errors);
+  ensure(['true-solar', 'standard'].includes(output.input?.timeBasis), 'input.timeBasis invalid', errors);
+  if (output.input?.timeBasis === 'true-solar') {
+    validateTimeCorrection(output.timeCorrection, errors);
+  }
+  ensure(Boolean(output.methodDetails?.sourceMethod), 'methodDetails.sourceMethod missing', errors);
+  ensure(Array.isArray(output.lines), 'lines must be array', errors);
+  ensure(output.lines?.length === 6, 'lines must contain 6 items', errors);
+  for (const [index, line] of (output.lines || []).entries()) {
+    ensure(line.position === index + 1, `lines[${index}].position should be ${index + 1}`, errors);
+    ensure([6, 7, 8, 9].includes(line.traditionalValue), `lines[${index}].traditionalValue invalid`, errors);
+    ensure(Boolean(line.sixRelative), `lines[${index}].sixRelative missing`, errors);
+    ensure(Boolean(line.sixSpirit), `lines[${index}].sixSpirit missing`, errors);
+    ensure(Boolean(line.najia), `lines[${index}].najia missing`, errors);
+  }
+  ensure(Boolean(output.hexagram?.name), 'hexagram.name missing', errors);
+  ensure(Boolean(output.hexagram?.mark), 'hexagram.mark missing', errors);
+  ensure(Boolean(output.hexagram?.palace), 'hexagram.palace missing', errors);
+  ensure(Number.isInteger(output.shiYing?.shi), 'shiYing.shi missing', errors);
+  ensure(Number.isInteger(output.shiYing?.ying), 'shiYing.ying missing', errors);
+  ensure(Array.isArray(output.sixSpirits), 'sixSpirits must be array', errors);
+  ensure(output.sixSpirits?.length === 6, 'sixSpirits must contain 6 items', errors);
+  ensure(Boolean(output.datePillars?.day), 'datePillars.day missing', errors);
+  ensure(Boolean(output.datePillars?.hour), 'datePillars.hour missing', errors);
+  return {
+    ok: errors.length === 0,
+    schema: 'fortune.liuyao.v1',
+    errors
+  };
+}
+
 export function attachSchemaValidation(output, validator) {
   const validation = validator(output);
   output.schemaValidation = validation.errors.length

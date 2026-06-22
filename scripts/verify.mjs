@@ -271,6 +271,124 @@ const checks = [
     }
   },
   {
+    label: 'qimen chart smoke',
+    run() {
+      const result = run(this.label, node, [
+        'scripts/qimen-chart.mjs',
+        '--datetime', '2026-06-22 14:30',
+        '--place', '上海',
+        '--question', '这个项目是否适合推进'
+      ]);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.schemaVersion === 'fortune.qimen.v1', 'expected qimen schema version');
+      assert(json.schemaValidation?.ok === true, 'expected qimen schema validation ok');
+      assert(json.timeCorrection?.corrected?.minute === 36, 'expected true solar corrected minute 36');
+      assert(json.palaces?.length === 9, 'expected 9 qimen palaces');
+      assert(json.ju?.type === '阴遁', 'expected 阴遁');
+      assert(json.ju?.number === 9, 'expected ju number 9');
+      assert(json.zhiFu?.star, 'expected zhiFu star');
+      assert(json.zhiShi?.gate, 'expected zhiShi gate');
+      assert(json.analysisHints?.zhiFuPalace, 'expected zhiFu palace hint');
+    }
+  },
+  {
+    label: 'liuyao manual chart smoke',
+    run() {
+      const result = run(this.label, python, [
+        'scripts/liuyao-chart.py',
+        '--method', 'manual',
+        '--lines', '6,7,8,9,8,7',
+        '--datetime', '2026-06-22 14:30',
+        '--place', '上海',
+        '--question', '这个项目是否适合推进'
+      ]);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.schemaVersion === 'fortune.liuyao.v1', 'expected liuyao schema version');
+      assert(json.schemaValidation?.ok === true, 'expected liuyao schema validation ok');
+      assert(json.hexagram?.name === '火水未济', 'expected 火水未济');
+      assert(json.changedHexagram?.name === '山泽损', 'expected 山泽损');
+      assert(json.movingLines?.join(',') === '1,4', 'expected moving lines 1,4');
+      assert(json.shiYing?.shi === 3, 'expected shi line 3');
+      assert(json.shiYing?.ying === 6, 'expected ying line 6');
+      assert(json.sixSpirits?.[0] === '朱雀', 'expected first six spirit 朱雀');
+      assert(json.lines?.[0]?.najia === '戊寅木', 'expected first najia 戊寅木');
+    }
+  },
+  {
+    label: 'liuyao time chart smoke',
+    run() {
+      const result = run(this.label, python, [
+        'scripts/liuyao-chart.py',
+        '--method', 'time',
+        '--datetime', '2026-06-22 14:30',
+        '--place', '上海',
+        '--question', '这个项目是否适合推进'
+      ]);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.schemaValidation?.ok === true, 'expected liuyao time schema validation ok');
+      assert(json.methodDetails?.sourceMethod === 'time_meihua_to_najia', 'expected time source method');
+      assert(json.traditionalLines?.join(',') === '7,8,8,9,8,8', 'expected generated traditional lines');
+      assert(json.movingLines?.join(',') === '4', 'expected moving line 4');
+      assert(json.hexagram?.name === '震为雷', 'expected 震为雷');
+      assert(json.changedHexagram?.name === '地雷复', 'expected 地雷复');
+    }
+  },
+  {
+    label: 'qimen invalid datetime',
+    run() {
+      const result = run(this.label, node, [
+        'scripts/qimen-chart.mjs',
+        '--datetime', '2026/06/22 14:30',
+        '--place', '上海',
+        '--question', 'x'
+      ], 1);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.error === 'invalid_datetime', 'expected invalid_datetime');
+    }
+  },
+  {
+    label: 'qimen missing place',
+    run() {
+      const result = run(this.label, node, [
+        'scripts/qimen-chart.mjs',
+        '--datetime', '2026-06-22 14:30',
+        '--question', 'x'
+      ], 1);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.error === 'missing_place', 'expected missing_place');
+    }
+  },
+  {
+    label: 'liuyao manual short lines',
+    run() {
+      const result = run(this.label, python, [
+        'scripts/liuyao-chart.py',
+        '--method', 'manual',
+        '--lines', '6,7,8',
+        '--datetime', '2026-06-22 14:30',
+        '--place', '上海',
+        '--question', 'x'
+      ], 1);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.error === 'invalid_lines', 'expected invalid_lines');
+    }
+  },
+  {
+    label: 'liuyao manual invalid line value',
+    run() {
+      const result = run(this.label, python, [
+        'scripts/liuyao-chart.py',
+        '--method', 'manual',
+        '--lines', '6,7,8,9,8,5',
+        '--datetime', '2026-06-22 14:30',
+        '--place', '上海',
+        '--question', 'x'
+      ], 1);
+      const json = parseJson(this.label, result.stdout);
+      assert(json.error === 'invalid_lines', 'expected invalid_lines');
+    }
+  },
+  {
     label: 'methodology framework summary',
     run() {
       const result = run(this.label, node, [

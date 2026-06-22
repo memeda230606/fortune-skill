@@ -66,9 +66,11 @@ PolyForm Noncommercial License 1.0.0 发布，仅限非商用使用；这不是 
 
 | 项目 | ⭐ | 语言 | License | 最近更新 | 用途 |
 |------|-----|------|---------|---------|------|
+| [3metaJun/3meta](https://github.com/3metaJun/3meta) | - | TypeScript | MIT | - | 奇门遁甲起局引擎（九宫、门星神、格局、值符值使） |
 | [SylarLong/iztro](https://github.com/SylarLong/iztro) | 3,617 | TypeScript | MIT | 2026-04-15 | 紫微斗数排盘引擎（12 宫、运限、四化、三方四正、插件系统） |
 | [6tail/lunar-javascript](https://github.com/6tail/lunar-javascript) | 1,502 | JavaScript | MIT | 2026-04-30 | 万年历+八字排盘（四柱、十神、五行、大运、流年、神煞、纳音） |
 | [china-testing/bazi](https://github.com/china-testing/bazi) | 1,285 | Python | 未声明 / accepted risk | 2026-02-03 | 三命通会论断、冲刑合会分析、五行分数、格局判定、合婚 |
+| [bopo/najia](https://github.com/bopo/najia) | - | Python | MIT | - | 六爻纳甲起卦（本卦、变卦、六亲、六神、世应、伏神） |
 | [jinchenma94/bazi-skill](https://github.com/jinchenma94/bazi-skill) | 1,208 | Markdown | MIT | 2026-04-04 | 分析流程框架 + 经典典籍 references（穷通宝典等九本） |
 
 ### 参考项目（不直接依赖）
@@ -92,6 +94,8 @@ fortune-skill/
 ├── scripts/
 │   ├── ziwei-chart.mjs         # iztro → 紫微盘 JSON
 │   ├── bazi-chart.mjs          # lunar → 八字盘 JSON
+│   ├── qimen-chart.mjs         # 3meta → 奇门遁甲起局 JSON
+│   ├── liuyao-chart.py         # najia → 六爻纳甲起卦 JSON
 │   └── bazi-classic.py         # china-testing/bazi → 三命通会评判 JSON
 ├── vendor/
 │   └── bazi/                   # china-testing/bazi（git clone）
@@ -101,7 +105,9 @@ fortune-skill/
     ├── dayun-rules.md          # 大运顺逆排规则
     ├── shichen-table.md        # 时辰对照表
     ├── ziwei-guide.md          # 紫微斗数解盘指南
-    └── bazi-guide.md           # 八字命理分析指南
+    ├── bazi-guide.md           # 八字命理分析指南
+    ├── qimen-guide.md          # 奇门遁甲占问指南
+    └── liuyao-guide.md         # 六爻纳甲占问指南
 ```
 
 ---
@@ -120,6 +126,12 @@ fortune-skill/
 │                                                    │
 │  bazi-classic.py ← china-testing/bazi              │
 │    三命通会论断、冲刑合会、五行分数、格局           │
+│                                                    │
+│  qimen-chart.mjs ← 3meta                           │
+│    九宫、门星神、阴阳遁、局数、值符值使、格局       │
+│                                                    │
+│  liuyao-chart.py ← najia                           │
+│    本卦、变卦、世应、六亲、六神、纳甲、伏神         │
 ├──────────────────────────────────────────────────┤
 │  Layer 2: 经典典籍（references/ Markdown）         │
 │                                                    │
@@ -180,7 +192,7 @@ Layer 1 保证排盘精确（LLM 自己算干支会出错），Layer 2 提供系
 ```bash
 npm ci
 python3 -m pip install -r requirements.txt
-npm run verify        # 26 项自检
+npm run verify        # 36 项自检
 ```
 
 **单脚本快速验证**（出生信息为虚构演示数据）：
@@ -189,6 +201,9 @@ npm run verify        # 26 项自检
 node scripts/bazi-chart.mjs --solar "1990-05-15" --hour 15 --gender male --birthplace "上海"
 node scripts/ziwei-chart.mjs --solar "1990-05-15" --hour 15 --gender male --birthplace "上海"
 python3 scripts/bazi-classic.py --solar "1990-05-15" --hour 15 --gender male --birthplace "上海"
+node scripts/qimen-chart.mjs --datetime "2026-06-22 14:30" --place "上海" --question "这个项目是否适合推进"
+python3 scripts/liuyao-chart.py --method manual --lines "6,7,8,9,8,7" --datetime "2026-06-22 14:30" --place "上海" --question "这个项目是否适合推进"
+python3 scripts/liuyao-chart.py --method time --datetime "2026-06-22 14:30" --place "上海" --question "这个项目是否适合推进"
 ```
 
 ---
@@ -232,6 +247,8 @@ node scripts/hecan-audit.mjs --solar "1990-05-15" --hour 15 --gender male --birt
 triggers:
   - "算命" "算八字" "看八字" "批八字" "排八字" "排盘"
   - "紫微" "紫微斗数" "看紫微盘"
+  - "奇门" "奇门遁甲" "起局"
+  - "六爻" "摇卦" "起卦" "纳甲"
   - "帮我看看命" "我的运势" "今年运势"
   - "合婚" "八字合婚"
   - "bazi" "ziwei" "fortune"
@@ -253,6 +270,8 @@ triggers:
 - 紫微排盘: node scripts/ziwei-chart.mjs --solar <date> --hour <0-23> [--minute <0-59>] --gender <male|female> --birthplace <city>
 - 八字排盘: node scripts/bazi-chart.mjs --solar <date> --hour <0-23> [--minute <0-59>] --gender <male|female> --birthplace <city>
 - 三命通会: python3 scripts/bazi-classic.py --solar <date> --hour <0-23> [--minute <0-59>] --gender <male|female> --birthplace <city>
+- 奇门起局: node scripts/qimen-chart.mjs --datetime "YYYY-MM-DD HH:mm" --place <city> --question <question>
+- 六爻起卦: python3 scripts/liuyao-chart.py --method manual --lines "6,7,8,9,8,7" --datetime "YYYY-MM-DD HH:mm" --place <city> --question <question>
 
 ## 分析流程
 1. 收集用户出生信息（日期、时间、性别、出生地）

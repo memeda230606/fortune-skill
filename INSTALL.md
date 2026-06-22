@@ -43,7 +43,7 @@ git clone https://github.com/ai-freer/fortune-skill.git ~/.claude/skills/fortune
 cd ~/.claude/skills/fortune
 npm ci
 python3 -m pip install -r requirements.txt
-npm run verify       # 26 测试
+npm run verify       # 36 测试
 ```
 
 重启 Claude Code（或新开会话），对话里直接说"算八字"等触发词即可。
@@ -128,7 +128,7 @@ cd ~/projects/fortune-skill
 
 ```bash
 npm run verify
-# expected: verified 26 checks
+# expected: verified 36 checks
 ```
 
 或单独跑某个排盘脚本：
